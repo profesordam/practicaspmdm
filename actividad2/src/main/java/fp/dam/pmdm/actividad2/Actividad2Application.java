@@ -8,9 +8,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.TreeMap;
+import java.util.function.Function;
 
 public class Actividad2Application extends Application {
 
@@ -20,22 +23,31 @@ public class Actividad2Application extends Application {
     public void onCreate() {
         super.onCreate();
         InputStream stream = getResources().openRawResource(R.raw.capitales);
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
-            String linea;
-            while ((linea = in.readLine()) != null) {
-                String [] items = linea.split(";");
-                Pais pais = new Pais(items[1], items[2], items[0]);
-                List<Pais> paises = datos.get(items[0]);
-                if (paises == null) {
-                    paises = new ArrayList<>();
-                    datos.put(items[0], paises);
-                }
-                paises.add(pais);
+        try (Scanner in = new Scanner(stream)) {
+            in.useDelimiter(";");
+            while (in.hasNext()) {
+                Pais pais = new Pais(in.next(), in.next(), in.next());
+                List<Pais> paises = datos.get(pais.nombre);
+//                datos.computeIfAbsent(pais.continente, k -> new ArrayList<Pais>()).add(pais);
+
+                datos.computeIfAbsent(pais.continente, new Function<String, List<Pais>>() {
+                    @Override
+                    public List<Pais> apply(String s) {
+                        return new ArrayList<>();
+                    }
+                }).add(pais);
+
+//                if (paises == null) {
+//                    paises = new ArrayList<>();
+//                    datos.put(pais.continente, paises);
+//                }
+//                paises.add(pais);
             }
-        } catch (IOException e) {
-            datos = null;
         }
     }
 
+    public List<Pais> getPaises(String continente) {
+        return Collections.unmodifiableList(datos.get(continente));
+    }
 
 }

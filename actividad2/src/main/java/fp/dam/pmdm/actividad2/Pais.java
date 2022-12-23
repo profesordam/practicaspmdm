@@ -6,7 +6,7 @@ public class Pais {
     String capital;
     String continente;
 
-    public Pais(String nombre, String capital, String continente) {
+    public Pais(String continente,String nombre, String capital) {
         this.nombre = nombre;
         this.capital = capital;
         this.continente = continente;
